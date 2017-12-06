@@ -34,6 +34,8 @@ void *startFileThreaded(void * filename){
                 exit(2);
     }
 
+    printf("filename attempting to open: %s\n",filename);
+
     FILE *file = fopen(filename, "r");
 
     if(!file){
@@ -218,7 +220,7 @@ void *startDirectory(void * path){
 					if(ptr!=NULL){
 						if(strcmp(ptr,".csv")==0){
 							char* file = malloc(sizeof(char)*1024);
- 							strcpy(file,directory);
+ 							strcpy(file,path);
 							strcat(file, "/");
 							strcat(file, dir->d_name);
 							pthread_t tid;
@@ -246,6 +248,48 @@ void *startDirectory(void * path){
 	
 }
 
+void sendSortRequest(){
+
+	int n;
+
+	int s;
+	int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+	struct addrinfo hints, *result;
+	memset(&hints, 0, sizeof(struct addrinfo));
+	hints.ai_family = AF_INET; 
+	hints.ai_socktype = SOCK_STREAM; 
+
+	s = getaddrinfo("localhost", "1234", &hints, &result);
+	if (s != 0) {
+	        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+        	exit(1);
+	}
+
+	if(connect(sock_fd, result->ai_addr, result->ai_addrlen) == -1){
+                perror("connect");
+                exit(2);
+    }
+
+    char  * sortRequest = calloc(32,sizeof(char)*32);
+
+    sortRequest[0] = 'c';
+
+    
+
+    
+
+    
+
+ 
+
+    write(sock_fd, sortRequest, 32);
+
+    close(sock_fd);
+
+
+}
+
 
 
 
@@ -258,6 +302,8 @@ int main (int argc, char ** argv){
  
 
  	startDirectory(inputDirectory);
+
+ 	sendSortRequest();
 
 
 

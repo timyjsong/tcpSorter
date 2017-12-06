@@ -50,7 +50,7 @@ void *acceptConnection(void  *client_fd){
                 printf("I have received the column to sort on and it is: %s\n", column);
                 printf("===\n");
 
-                return(1);
+                return(NULL);
             }
 
 
@@ -101,6 +101,7 @@ void *acceptConnection(void  *client_fd){
                     fputs(wholeFile,fp);
                 }
                 fclose(fp);
+                fileCounter++;
 
 
 
@@ -123,8 +124,15 @@ void *acceptConnection(void  *client_fd){
                 printf("===\n");            
                 free(wholeFile);
 
+                return(NULL);
 
 
+
+            }
+
+            if(buffer[0]=='c'){
+                printf("I have received a sort request, this means all the files I need are in my directory, and I must sort and send them back");
+                exit(0);
             }    
         
     }    
