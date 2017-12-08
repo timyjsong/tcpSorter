@@ -13,6 +13,10 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 
+char port[256];
+
+char server[1024];
+
 void *startFileThreaded(void * filename){
 
 	int s;
@@ -23,7 +27,7 @@ void *startFileThreaded(void * filename){
 	hints.ai_family = AF_INET; 
 	hints.ai_socktype = SOCK_STREAM; 
 
-	s = getaddrinfo("localhost", "1234", &hints, &result);
+	s = getaddrinfo(server, port, &hints, &result);
 	if (s != 0) {
 	        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
         	exit(1);
@@ -128,7 +132,7 @@ void sendColumn(char* column){
 	hints.ai_family = AF_INET; 
 	hints.ai_socktype = SOCK_STREAM; 
 
-	s = getaddrinfo("localhost", "1234", &hints, &result);
+	s = getaddrinfo(server, port, &hints, &result);
 	if (s != 0) {
 	        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
         	exit(1);
@@ -260,7 +264,7 @@ void sendSortRequest(){
 	hints.ai_family = AF_INET; 
 	hints.ai_socktype = SOCK_STREAM; 
 
-	s = getaddrinfo("localhost", "1234", &hints, &result);
+	s = getaddrinfo(server, port, &hints, &result);
 	if (s != 0) {
 	        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
         	exit(1);
@@ -289,7 +293,17 @@ void sendSortRequest(){
 
 
 }
+void setPort(char* arg){
 
+	strcpy(port,arg);
+
+}
+
+void setServer(char * arg){
+
+	strcpy(server,arg);
+
+}
 
 
 
@@ -297,6 +311,12 @@ int main (int argc, char ** argv){
 
 	char * inputDirectory = malloc(sizeof(char)*1024);
  	getcwd(inputDirectory, sizeof(char)*1024);
+
+
+ 	setServer(argv[4]);
+
+
+ 	setPort(argv[6]);
 
  	sendColumn(argv[2]);
  
