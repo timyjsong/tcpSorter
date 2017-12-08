@@ -85,17 +85,19 @@ void *startFileThreaded(void * filename){
 
 
 
+    	int toSend =size;
 
-    	int n = 0;
+    	char * filePtr = buffer;
 
-    	while(n<size){
-    		n = write(sock_fd,buffer, size-n);
+    	while(toSend>0){
+    		int n = write(sock_fd,filePtr, toSend);
     		if (n<0){
     			perror("write");
-    		}	
-    	}	
+    		}
 
-    	printf("return value: %d\n",n);
+    		filePtr+=n;
+    		toSend-=n;	
+    	}	
 
 
   
