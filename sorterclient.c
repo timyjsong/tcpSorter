@@ -46,7 +46,6 @@ void *startFileThreaded(void * filename){
     	perror(NULL);
     }
 
-
     struct stat st;
 
     stat(filename, &st);
@@ -54,23 +53,14 @@ void *startFileThreaded(void * filename){
     printf("actual size: %d\n", st.st_size);
 
     int size = st.st_size;
-
     char  * fileSize = calloc(32,sizeof(char)*32);
 
     sprintf(fileSize, "%d", size);
 
     char firstMessage[32] = "b";
-
     strcat(firstMessage,fileSize);
 
-    
-
-
-
-
     write(sock_fd, firstMessage, 32);
-
-    
 
     char buffer[size];
 
@@ -79,14 +69,9 @@ void *startFileThreaded(void * filename){
     }
 
 
-
-
     printf("The size of the buffer i am writing to: %d \n",size);
 
-
-
     	int toSend =size;
-
     	char * filePtr = buffer;
 
     	while(toSend>0){
@@ -99,26 +84,11 @@ void *startFileThreaded(void * filename){
     		toSend-=n;	
     	}	
 
-
-  
-
-
-
     //printf("whole buffer:%s\n",buffer);
-
-
 
     close(sock_fd);
 
-
     free(filename);
-
-
-
-
-
-
-
 
 }
 
@@ -151,8 +121,6 @@ void sendColumn(char* column){
 
     strcat(columnToSend,column);
 
-    
-
     printf("The column i am sending is: %s\n",columnToSend);
 
     //char check[256];
@@ -171,13 +139,6 @@ void sendColumn(char* column){
     write(sock_fd, columnToSend, 32);
 
     close(sock_fd);
-
-
-
-
-
-
-
 }
 
 
@@ -186,20 +147,10 @@ void *startDirectory(void * path){
 	DIR *d;
 	struct dirent *dir;
 
- 	
  	char directory[1024];
  	strcpy(directory, path);
 
-
- 	
-
- 	
-
-
-
 	d = opendir(directory);
-
-
 
 	if (d){
 		while ((dir = readdir(d)) != NULL){
@@ -215,8 +166,6 @@ void *startDirectory(void * path){
 					strcpy(toEnter, directory);
 					pthread_create(&tid, NULL, startDirectory, toEnter);
 					pthread_join(tid,NULL);
-					
-
 
 				}
 				if(dir->d_type == DT_REG){
@@ -237,8 +186,6 @@ void *startDirectory(void * path){
 						}
 					}
 
-
-
 				}
 			}
 
@@ -248,10 +195,7 @@ void *startDirectory(void * path){
 	}
 	
 	free(path);
-	
-	
-	
-	
+
 }
 
 void sendSortRequest(){
@@ -280,14 +224,6 @@ void sendSortRequest(){
     char  * sortRequest = calloc(32,sizeof(char)*32);
 
     sortRequest[0] = 'c';
-
-    
-
-    
-
-    
-
- 
 
     write(sock_fd, sortRequest, 32);
 
@@ -326,12 +262,6 @@ int main (int argc, char ** argv){
  	startDirectory(inputDirectory);
 
  	sendSortRequest();
-
-
-
-
-
-
 
 	return 0;
 }

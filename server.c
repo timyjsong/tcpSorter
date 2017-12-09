@@ -15,26 +15,14 @@ int fileCounter = 0;
 pthread_mutex_t columnMutex;
 
 void *acceptConnection(void  *client_fd){
-
-
-
             // int n;
-
-
-
-        
-
             // char * ready = "READY";
-
-
-
 
             // n = write(client_fd, ready, strlen(ready));
 
             // if(n <0){
             //     perror("write");
             // }
-
 
             char buffer[32];
             int len = read(client_fd, buffer, sizeof(buffer));
@@ -44,7 +32,6 @@ void *acceptConnection(void  *client_fd){
 
             printf("The first thing i read on this connection is: %s\n", buffer);
 
-
             if(buffer[0] == 'a'){
                 strcpy(column, buffer);
                 printf("I have received the column to sort on and it is: %s\n", column);
@@ -53,30 +40,20 @@ void *acceptConnection(void  *client_fd){
                 return(NULL);
             }
 
-
-
             if(buffer[0]== 'b'){
 
-
                 printf("The size of the incoming csv is: %s\n", buffer);
-
-             
-
-                
 
                 memmove(buffer, buffer+1, strlen(buffer));
 
                 printf("New buffer size: %s\n",buffer);
 
-                
 
                 char * wholeFile = malloc(atoi(buffer));
-
                 int size = atoi(buffer);
 
           
                 int toRead = size;
-
                 char * filePtr = wholeFile;
 
                 while (toRead>0){
@@ -87,7 +64,7 @@ void *acceptConnection(void  *client_fd){
 
                 }
 
-                wholeFile[atoi(buffer)+1] = '\0';  
+                wholeFile[atoi(buffer)+1] = '\0';
 
                 char * fileName[256];
 
@@ -103,30 +80,10 @@ void *acceptConnection(void  *client_fd){
                 fclose(fp);
                 fileCounter++;
 
-
-
-
-
-                
-
-
-
-          
-
-
-                  
-                
-               
-                
-
-  
-
                 printf("===\n");            
                 free(wholeFile);
 
                 return(NULL);
-
-
 
             }
 
@@ -135,7 +92,7 @@ void *acceptConnection(void  *client_fd){
                 exit(0);
             }    
         
-    }    
+}
 
 
 
@@ -173,8 +130,6 @@ int main(int argc, char **argv){
     printf("Waiting for connection...\n");
 
 
-
-
     while(1){
         int client_fd = accept(sock_fd, NULL, NULL);
 
@@ -187,13 +142,7 @@ int main(int argc, char **argv){
 
     }
 
-
-    
-
-
     pthread_mutex_destroy(&columnMutex);
-
-  
 
     return 0;
 }
