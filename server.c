@@ -2,14 +2,15 @@
 
 int main(int argc, char **argv)
 {
+
     int s;
     int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
-
     struct addrinfo hints, *result;
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
+
 
     s = getaddrinfo(NULL, "1234", &hints, &result);
     if (s != 0) {
@@ -28,20 +29,21 @@ int main(int argc, char **argv)
     }
     
     struct sockaddr_in *result_addr = (struct sockaddr_in *) result->ai_addr;
+
     printf("Listening on file descriptor %d, port %d\n", sock_fd, ntohs(result_addr->sin_port));
 
     printf("Waiting for connection...\n");
 
 
     while(1){
+
         int client_fd = accept(sock_fd, NULL, NULL);
 
         printf("Connection made: client_fd=%d\n", client_fd);
-
         pthread_t tid;
         pthread_create(&tid,NULL,acceptConnection, client_fd);
+        printf("num clients: %d\n",num_clients);
         pthread_join(tid,NULL);
-
 
     }
     return 0;

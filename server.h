@@ -16,6 +16,10 @@ int fileCounter = 0;
 
 pthread_mutex_t columnMutex;
 
+int num_clients = -1;
+
+char *sort_col_name[1000];
+
 static void *acceptConnection(int client_fd);
 
 static void *acceptConnection(int  client_fd){
@@ -28,34 +32,37 @@ static void *acceptConnection(int  client_fd){
 
     printf("The first thing i read on this connection is: %s\n", buffer);
 
+    //if a then store sort_col_name
+
+    //if b then create output folder, store as CSV file in output folder
+
+    //if c then merge CSV's into one file, sort, and return large CSV
+
 
     if(buffer[0] == 'a'){
+    	num_clients++;
+    	int i = 0;
+    	for(i = 1; i<=sizeof(buffer); i++){
+    		buffer[i-1] = buffer[i];
+    	}
+    	buffer[i] = '\0';
         strcpy(column, buffer);
         printf("I have received the column to sort on and it is: %s\n", column);
+        sort_col_name[num_clients] = column;
+        printf("sortcolname: %s\n",sort_col_name[num_clients]);
         printf("===\n");
-
         return(NULL);
     }
 
 
-
     if(buffer[0]== 'b'){
 
-
         printf("The size of the incoming csv is: %s\n", buffer);
-
-     
-
-        
 
         memmove(buffer, buffer+1, strlen(buffer));
 
         printf("New buffer size: %s\n",buffer);
-
-        printf("here1\n");
-
         
-
         char * wholeFile = malloc(atoi(buffer));
 
         int size = atoi(buffer);
@@ -100,7 +107,7 @@ static void *acceptConnection(int  client_fd){
 
     if(buffer[0]=='c'){
         printf("I have received a sort request, this means all the files I need are in my directory, and I must sort and send them back");
-        exit(0);
+        //exit(0);
     }    
     
 }
