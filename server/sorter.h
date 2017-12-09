@@ -83,7 +83,9 @@ void Merge_int(int low, int mid, int high);
 void MergeSort(int low, int high, int n);
 
 // other function declarations
-static void *traverse_dir(void *arg_struct);
+void sort_files_server();
+
+static void *traverse_dir(arg_struct_t *args);
 
 static void print_output(arg_struct_t *argstruct);
 
@@ -749,7 +751,7 @@ static void *found_CSVfile(void *argstruct) {
     FILE *fp2 = fopen("childpids.txt", "a"); //a means append to file
     fprintf(fp2, "\n%lu", pthread_self());
     fclose(fp2);
-    sort_file(args -> file_name, path, args->sort_col_name, args->output_dir_name, args->output_dir_flag);
+    sort_file(args->file_name, path, args->sort_col_name, args->output_dir_name, args->output_dir_flag);
     pthread_exit(NULL);
     exit(0);
 }
@@ -813,13 +815,11 @@ static int getnumthreads() {
     return num;
 }
 
-static void *traverse_dir(void *argstruct) {
+static void *traverse_dir(arg_struct_t *args) {
 
     //arg_struct_t *args = malloc(sizeof(arg_struct_t) * STRUCT_MEM_SIZE);
 
     pthread_mutex_lock(&mutex);
-
-    arg_struct_t *args = (arg_struct_t *) argstruct;
 
     char dir_base[1000];
     strcpy(dir_base,args->place_holder);
@@ -874,8 +874,7 @@ static void *traverse_dir(void *argstruct) {
                 pthread_mutex_unlock(&mutex);
                 //pthread_cond_signal(&cv);
 
-                int status;
-                status = pthread_join(thread_file[counter_file], NULL);
+                int status = pthread_join(thread_file[counter_file], NULL);
                 if (status != 0) {
                     printf("can't join!\n");
                 }
@@ -888,25 +887,43 @@ static void *traverse_dir(void *argstruct) {
     pthread_exit(NULL);
 }
 
-void sort_files() {
+void sort_files_server() {
 
     /*
      * This function is to be called when the request is sent from a client to sort all files
      * Process:
      * 1 - Check that there are files, if not then return 0
      *
+     *--------------------
      * THIS FUNCTION:
      * 2 - Traverse directory that contains all files that have been written to the socket
      *          This may be the current directory? Or it may be a sub-directory?
+     *          Modified traverse dir to look only in top directory (assumes no sub directories)
+     *
      * 3 - Call sort for each file, creating a new thread for each (same approach as PA2)
+     *
      * 4 - Print output to a file named AllFiles-sorted-XXX.csv as (same approach as PA2)
+     *--------------------
      *
      * 5 - Initiate sending a response that indicates success / failure?
      * 6 - Send file bytes back to client to be reconstructed as csv
      */
 
+    // create an argument struct, allocate memory and set fields
+    arg_struct_t *args = malloc(sizeof(arg_struct_t));
+    // TODO: Get all this information from user input!
+    args->print_dir = "x";
+    args->dir_base = "x";
+    args->dir_name = "x";
+    args->file_name = "x";
+    args->output_dir_flag = "x";
+    args->output_dir_name = "x";
+    args->place_holder = "x";
+    args->sort_col_name = "x";
 
+    traverse_dir(args);
 
+    return;
 }
 
 #endif

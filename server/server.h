@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include "sorter.h"
 
 char column[32];
 int fileCounter = 0;
@@ -110,7 +111,9 @@ static void *acceptConnection(int  client_fd){
 
     if(buffer[0]=='c'){
         printf("I have received a sort request, this means all the files I need are in my directory, and I must sort and send them back\n");
-        return(NULL);
+
+        sort_files_server();
+
         //exit(0);
     } 
 }
