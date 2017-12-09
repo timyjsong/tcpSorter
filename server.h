@@ -16,8 +16,12 @@ int fileCounter = 0;
 
 pthread_mutex_t columnMutex;
 
+/*to keep track of the # of client requests, 
+to act as counter for different sort col names */
 int num_clients = -1;
 
+/*array for sort col names, stores the column names
+uses num_clients as index*/
 char *sort_col_name[1000];
 
 static void *acceptConnection(int client_fd);
@@ -32,13 +36,12 @@ static void *acceptConnection(int  client_fd){
 
     printf("The first thing i read on this connection is: %s\n", buffer);
 
-    //if a then store sort_col_name
 
     //if b then create output folder, store as CSV file in output folder
 
     //if c then merge CSV's into one file, sort, and return large CSV
 
-
+    //if a then store sort_col_name
     if(buffer[0] == 'a'){
     	num_clients++;
     	int i = 0;
@@ -106,10 +109,10 @@ static void *acceptConnection(int  client_fd){
     }
 
     if(buffer[0]=='c'){
-        printf("I have received a sort request, this means all the files I need are in my directory, and I must sort and send them back");
+        printf("I have received a sort request, this means all the files I need are in my directory, and I must sort and send them back\n");
+        return(NULL);
         //exit(0);
-    }    
-    
+    } 
 }
 
 #endif

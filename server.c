@@ -1,7 +1,11 @@
 #include "server.h"
 
+pthread_mutex_t columnMutex;
+
 int main(int argc, char **argv)
 {
+
+    pthread_mutex_init(&columnMutex, NULL);
 
     int s;
     int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -46,5 +50,8 @@ int main(int argc, char **argv)
         pthread_join(tid,NULL);
 
     }
+
+    pthread_mutex_destroy(&columnMutex);
+    
     return 0;
 }
