@@ -18,7 +18,7 @@
 #include <errno.h>
 #include <setjmp.h>
 #include <sys/stat.h>
-#include <pthread.h>a
+#include <pthread.h>
 #include <sys/syscall.h>
 
 /* defined constants */
