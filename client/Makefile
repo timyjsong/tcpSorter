@@ -1,5 +1,5 @@
 server: server.c
-	gcc server.c -o server
+	gcc -pthread -o server server.c
 
 clientsorter: clientsorter.c
-	gcc clientsorter.c -o clientsorter
+	gcc -pthread -o clientsorter clientsorter.c
