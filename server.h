@@ -67,7 +67,7 @@ typedef struct _MOVIE {
 } movie_t;
 
 /*global array to hold all movies from all files plus a counter*/
-movie_t total_movies[100000000];
+movie_t  *total_movies;
 static int n_total_movies = 0;
 
 char column[32];
@@ -560,7 +560,12 @@ static void sort_file(char *fileName, char* column_sort) {
             */
         }
 
+
         n_total_movies++;
+
+
+        total_movies = realloc(total_movies,sizeof(movie_t)*(n_total_movies+1));
+
     }
     
     fclose(file);
@@ -570,13 +575,18 @@ static void sort_file(char *fileName, char* column_sort) {
 
 static void *output_directory(int buffer[32], int  client_fd)
 {
-	char * wholeFile = malloc(BUFFER_SIZE);
+	
     int size = atoi(buffer);
+    char * wholeFile = malloc(size);
     int toRead = size;
     char * filePtr = wholeFile;
     while (toRead>0)
     {
         int n = read(client_fd, filePtr, toRead);
+        if (n<0){
+            perror("read");
+            exit(0);
+        }
         filePtr+=n;
         toRead -=n;
     }
@@ -662,7 +672,7 @@ static void *acceptConnection(int  client_fd){
 
 
     	/*sorts total movies array*/
-    	MergeSort(0, n_total_movies - 1, n_total_movies);
+    	//MergeSort(0, n_total_movies - 1, n_total_movies);
         /*this prints all the movies from array to ONE csv file, saved in current directory*/
     	print_global_movies();
 
@@ -670,6 +680,56 @@ static void *acceptConnection(int  client_fd){
         //send sorted file back to client
 
         printf("I have received a sort request, this means all the files I need are in my directory, and I must sort and send them back\n");
+
+        char sizeHeader[32];
+
+        FILE *file = fopen("output_total.csv", "r");
+        
+        if(!file){
+            perror(NULL);
+
+        }
+
+        struct stat st;
+
+        stat("output_total.csv",&st);
+
+        int size = st.st_size;
+
+        printf("the size of the main file is: %d\n",size);
+        sprintf(sizeHeader,"%d",size);
+
+        int n = write(client_fd,sizeHeader,32);
+
+        if(n<0){
+            perror("write");
+        }
+
+        char * finalFile = malloc(size);
+
+        if(finalFile){
+            fread(finalFile,1,size,file);
+        }
+
+        int toSend =size;
+        char * filePtr = finalFile;
+
+        while(toSend>0){
+            int n = write(client_fd,filePtr, toSend);
+            if (n<0){
+                perror("write");
+            }
+
+            filePtr+=n;
+            toSend-=n;  
+        }   
+
+
+
+
+
+
+
         return(NULL);
         //exit(0);
     } 

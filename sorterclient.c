@@ -16,6 +16,7 @@
 char port[256];
 
 char server[1024];
+char finalColumn[128];
 
 void *startFileThreaded(void * filename){
 
@@ -88,6 +89,7 @@ void *startFileThreaded(void * filename){
 
     close(sock_fd);
 
+    free(fileSize);
     free(filename);
 
 }
@@ -200,7 +202,7 @@ void *startDirectory(void * path){
 
 void sendSortRequest(){
 
-	int n;
+	
 
 	int s;
 	int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -226,6 +228,58 @@ void sendSortRequest(){
     sortRequest[0] = 'c';
 
     write(sock_fd, sortRequest, 32);
+
+    char fileSize[32];
+
+    int n = read(sock_fd, fileSize, 32);
+
+    if(n<0){
+    	perror("read");
+    }
+
+    int size = atoi(fileSize);
+    char  * finalFile = malloc(size);
+
+    printf("i am getting ready to receive a file of size %d\n",size);
+
+    int toRead = size;
+
+    char * filePtr = finalFile;
+
+    while(toRead>0){
+
+    	int n = read(sock_fd, filePtr, toRead);
+        if (n<0){
+            perror("read");
+            exit(0);
+        }
+        filePtr+=n;
+        toRead -=n;
+
+    }
+
+    char * filename = malloc(sizeof(char) * 1024);
+
+    strcpy(filename, "AllFiles-sorted-");
+    strcat(filename, finalColumn);
+    strcat(filename,".csv");
+
+    FILE *fp = fopen(filename, "w");
+
+    if(fp)
+    {
+        fputs(finalFile,fp);
+    }
+
+    fclose(fp);
+
+    free(finalFile);
+    free(filename);
+
+
+
+
+
 
     close(sock_fd);
 
@@ -259,16 +313,17 @@ int main (int argc, char ** argv){
  	setPort(argv[6]);
 
  	sendColumn(argv[2]);
+ 	strcpy(finalColumn,argv[2]);
 
  	int index;
- 	for(index = 2; index < argc; index+=2){
- 		switch(argv[index-1][1]){
- 			case 'd':
- 				inputDirectory = argv[index];
- 			case 'o':
- 				outputDir = argv[index];	
- 		}
- 	}
+ 	// for(index = 2; index < argc; index+=2){
+ 	// 	switch(argv[index-1][1]){
+ 	// 		case 'd':
+ 	// 			inputDirectory = argv[index];
+ 	// 		case 'o':
+ 	// 			outputDir = argv[index];	
+ 	// 	}
+ 	// }
  	startDirectory(inputDirectory);
 
 	sendSortRequest();

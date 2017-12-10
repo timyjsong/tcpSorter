@@ -5,6 +5,8 @@ pthread_mutex_t columnMutex;
 int main(int argc, char **argv)
 {
 
+	total_movies = malloc(sizeof(movie_t));
+
     pthread_mutex_init(&columnMutex, NULL);
 
     int s;
