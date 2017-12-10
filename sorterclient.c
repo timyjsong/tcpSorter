@@ -247,6 +247,8 @@ void setServer(char * arg){
 
 int main (int argc, char ** argv){
 
+	char outputDir[256];
+
 	char * inputDirectory = malloc(sizeof(char)*1024);
  	getcwd(inputDirectory, sizeof(char)*1024);
 
@@ -257,11 +259,19 @@ int main (int argc, char ** argv){
  	setPort(argv[6]);
 
  	sendColumn(argv[2]);
- 
 
+ 	int index;
+ 	for(index = 2; index < argc; index+=2){
+ 		switch(argv[index-1][1]){
+ 			case 'd':
+ 				inputDirectory = argv[index];
+ 			case 'o':
+ 				outputDir = argv[index];	
+ 		}
+ 	}
  	startDirectory(inputDirectory);
 
- 	sendSortRequest();
+	sendSortRequest();
 
 	return 0;
 }
