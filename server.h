@@ -82,8 +82,17 @@ uses num_clients as index*/
 char *sort_col_name[1000];
 
 static void *acceptConnection(int client_fd);
-
+static char *split_string(char *str, char const *delimiters);
+static void check_CSV(char *fileName);
+static int check_for_quotes(const char *string);
+static void remove_quotes(char *str);
+static char *add_quotes(char *str);
+static void trimstring(char *str);
+static int check_commas(char *line, char const delimiters[2], int n);
+static void return_Column(char *column_sort, int i);
+static void sort_file(char *fileName, char* column_sort);
 static void *output_directory(int buffer[32], int  client_fd);
+
 
 static char *split_string(char *str, char const *delimiters) {
 
@@ -108,6 +117,57 @@ static char *split_string(char *str, char const *delimiters) {
     }
 
     return ret;
+}
+
+static void print_global_movies() 
+{
+    FILE* file_total;
+    file_total = fopen("output_total.csv","w");
+    fprintf(file_total, "color,director_name,num_critic_for_reviews,duration,director_facebook_likes,actor_3_facebook_likes,actor_2_name,actor_1_facebook_likes,gross,genres,actor_1_name,movie_title,num_voted_users,cast_total_facebook_likes,actor_3_name,facenumber_in_poster,plot_keywords,movie_imdb_link,num_user_for_reviews,language,country,content_rating,budget,title_year,actor_2_facebook_likes,imdb_score,aspect_ratio,movie_facebook_likes\n");
+
+    int j;
+
+    /*fprintf(stdout,
+            "color,director_name,num_critic_for_reviews,duration,director_facebook_likes,actor_3_facebook_likes,actor_2_name,actor_1_facebook_likes,gross,genres,actor_1_name,movie_title,num_voted_users,cast_total_facebook_likes,actor_3_name,facenumber_in_poster,plot_keywords,movie_imdb_link,num_user_for_reviews,language,country,content_rating,budget,title_year,actor_2_facebook_likes,imdb_score,aspect_ratio,movie_facebook_likes\n");
+	*/
+    for (j = 0; j < n_total_movies; j++) {
+
+        if (total_movies[j].has_quotes == 1) {
+            total_movies[j].movie_title = add_quotes(total_movies[j].movie_title);
+        }
+
+        fprintf(file_total, "%s,%s,%d,%d,%d,%d,%s,%d,%d,%s,%s,%s,%d,%d,%s,%d,%s,%s,%d,%s,%s,%s,%d,%d,%d,%.2f,%.2f,%d\n",
+                total_movies[j].color,
+                total_movies[j].director_name,
+                total_movies[j].num_critic_for_reviews,
+                total_movies[j].duration,
+                total_movies[j].director_facebook_likes,
+                total_movies[j].actor_3_facebook_likes,
+                total_movies[j].actor_2_name,
+                total_movies[j].actor_1_facebook_likes,
+                total_movies[j].gross,
+                total_movies[j].genres,
+                total_movies[j].actor_1_name,
+                total_movies[j].movie_title,
+                total_movies[j].num_voted_users,
+                total_movies[j].cast_total_facebook_likes,
+                total_movies[j].actor_3_name,
+                total_movies[j].facenumber_in_poster,
+                total_movies[j].plot_keywords,
+                total_movies[j].movie_imdb_link,
+                total_movies[j].num_user_for_reviews,
+                total_movies[j].language,
+                total_movies[j].country,
+                total_movies[j].content_rating,
+                total_movies[j].budget,
+                total_movies[j].title_year,
+                total_movies[j].actor_2_facebook_likes,
+                total_movies[j].imdb_score,
+                total_movies[j].aspect_ratio,
+                total_movies[j].movie_facebook_likes
+        );
+    }
+    fclose(file_total);
 }
 
 static void check_CSV(char *fileName) {
@@ -594,13 +654,21 @@ static void *acceptConnection(int  client_fd){
 
         output_directory(buffer, client_fd);
         
-        
-
         return(NULL);
 
     }
 
     if(buffer[0]=='c'){
+
+
+    	/*sorts total movies array*/
+    	MergeSort(0, n_total_movies - 1, n_total_movies);
+        /*this prints all the movies from array to ONE csv file, saved in current directory*/
+    	print_global_movies();
+
+        //now delete the other files
+        //send sorted file back to client
+
         printf("I have received a sort request, this means all the files I need are in my directory, and I must sort and send them back\n");
         return(NULL);
         //exit(0);
