@@ -18,7 +18,10 @@ int main(int argc, char **argv)
     hints.ai_flags = AI_PASSIVE;
 
 
-    s = getaddrinfo(NULL, "1234", &hints, &result);
+    char *portno = malloc(sizeof(char)*BUFFER_SIZE);
+    strcpy(portno, argv[2]);
+    // TODO: Implement input argument flags correctly
+    s = getaddrinfo(NULL, portno, &hints, &result);
     if (s != 0) {
             fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
             exit(1);
