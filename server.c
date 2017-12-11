@@ -16,7 +16,6 @@ int main(int argc, char **argv)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-
     char *portno = malloc(sizeof(char)*BUFFER_SIZE);
     strcpy(portno, argv[2]);
     // TODO: Implement input argument flags correctly
@@ -42,9 +41,24 @@ int main(int argc, char **argv)
 
     if(DEBUG) printf("Waiting for connection...\n");
 
-    while(1){
+    while(1) {
 
         int client_fd = accept(sock_fd, NULL, NULL);
+
+
+        // ADDED THIS to print ip address of client
+        // Doesn't print for some reason?
+        if(num_clients == -1) {
+            printf("Received connections from: ");
+        }
+        struct sockaddr_in ad;
+        socklen_t ad_size = sizeof(struct sockaddr_in);
+        int res = getpeername(sock_fd, (struct sockaddr *)&ad, &ad_size);
+        char clientip[20];
+        strcpy(clientip, inet_ntoa(ad.sin_addr));
+        printf("%s,", clientip);
+
+
 
         if(DEBUG) printf("Connection made: client_fd=%d\n", client_fd);
         pthread_t tid;
