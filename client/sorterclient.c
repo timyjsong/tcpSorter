@@ -12,11 +12,12 @@
 #include <pthread.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 #define DEBUG 0
+#define STR_LEN 256
 
 char port[256];
-
 char server[1024];
 char finalColumn[128];
 
@@ -200,7 +201,7 @@ void *startDirectory(void * path){
 		closedir(d);
 	}
 	
-	free(path);
+	//free(path);
 
 }
 
@@ -280,44 +281,128 @@ void sendSortRequest(){
     free(finalFile);
     free(filename);
 
-
-
-
-
-
     close(sock_fd);
 
-
-}
-void setPort(char* arg){
-
-	strcpy(port,arg);
-
 }
 
-void setServer(char * arg){
+static char *split_string(char *str, char const *delimiters) {
 
-	strcpy(server,arg);
+	static char *src = NULL;
+	char *p, *ret = 0;
 
+	if (str != NULL) {
+		src = str;
+	}
+
+	if (src == NULL) {
+		return NULL;
+	}
+
+	if ((p = strpbrk(src, delimiters)) != NULL) {
+		*p = 0;
+		ret = src;
+		src = ++p;
+	} else if (*src) {
+		ret = src;
+		src = NULL;
+	}
+
+	return ret;
 }
-
-
 
 int main (int argc, char ** argv){
 
-	char outputDir[256];
+	// read all input arguments first
+	int c, input_dir_flag = 0, output_dir_flag = 0, c_args = 0;
+	char sort_col_name[STR_LEN], input_dir_name[STR_LEN], output_dir_name[STR_LEN];
+	while ((c = getopt(argc, argv, "c:p:h:d:o:")) != -1) {
+		switch (c) {
+			case 'c':
+				c_args = 1;
+				char* initial_optarg = optarg;
 
-	char * inputDirectory = malloc(sizeof(char)*1024);
- 	getcwd(inputDirectory, sizeof(char)*1024);
+				char *p1 = split_string(initial_optarg, ",");
+				strcpy(sort_col_name, p1);
 
+				while (p1) {
 
- 	setServer(argv[4]);
+					if (*p1) {
+					} else {
+						p1 = "";
+					}
+					p1 = split_string(NULL, ",");
+				}
 
+				break;
+			case 'h':
+				strcpy(server,optarg);
+				break;
+			case 'p':
+				strcpy(port, optarg);
+				break;
+			case 'd':
+				strcpy(input_dir_name, optarg);
+				input_dir_flag = 1;
 
- 	setPort(argv[6]);
+				DIR* dir_directory = opendir(input_dir_name);
+				if (dir_directory)
+				{
+					closedir(dir_directory);
+				}
+				else if (ENOENT == errno)
+				{
+					printf("ERROR: given directory does not exist. Using current directory.\n");
+					input_dir_flag = 0;
+				}
+				else
+				{
+					printf("ERROR: given directory failed to open.\n");
+					exit(1);
+				}
+				break;
+			case 'o':
+				strcpy(output_dir_name, optarg);
+				output_dir_flag = 1;
 
- 	sendColumn(argv[2]);
- 	strcpy(finalColumn,argv[2]);
+				DIR* dir_output = opendir(output_dir_name);
+				if (dir_output)
+				{
+					closedir(dir_output);
+				}
+				else if (ENOENT == errno)
+				{
+					printf("ERROR: output directory does not exist.\n");
+					exit(1);
+				}
+				else
+				{
+					printf("ERROR: output directory failed to open.\n");
+					exit(1);
+				}
+				break;
+			case ':':
+				switch (optopt)
+				{
+					case 'd':
+						printf("ERROR: option -%c with default argument value\n", optopt);
+						break;
+					default:
+						fprintf(stderr, "ERROR: option -%c is missing a required argument\n", optopt);
+						exit(1);
+				}
+				break;
+			case '?':
+				printf("ERROR: unrecognized option\n");
+				exit(1);
+		}
+	}
+
+	if (!input_dir_flag) {
+ 		getcwd(input_dir_name, sizeof(char)*STR_LEN);
+	}
+
+ 	sendColumn(sort_col_name);
+ 	strcpy(finalColumn,sort_col_name);
 
  	int index;
  	// for(index = 2; index < argc; index+=2){
@@ -325,10 +410,10 @@ int main (int argc, char ** argv){
  	// 		case 'd':
  	// 			inputDirectory = argv[index];
  	// 		case 'o':
- 	// 			outputDir = argv[index];	
+ 	// 			output_dir_name = argv[index];
  	// 	}
  	// }
- 	startDirectory(inputDirectory);
+ 	startDirectory(input_dir_name);
 
 	sendSortRequest();
 
