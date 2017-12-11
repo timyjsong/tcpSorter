@@ -13,6 +13,8 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 
+#define DEBUG 0
+
 char port[256];
 
 char server[1024];
@@ -39,7 +41,7 @@ void *startFileThreaded(void * filename){
                 exit(2);
     }
 
-    printf("filename attempting to open: %s\n",filename);
+	if(DEBUG) printf("filename attempting to open: %s\n",filename);
 
     FILE *file = fopen(filename, "r");
 
@@ -51,7 +53,7 @@ void *startFileThreaded(void * filename){
 
     stat(filename, &st);
 
-    printf("actual size: %d\n", st.st_size);
+	if(DEBUG) printf("actual size: %d\n", st.st_size);
 
     int size = st.st_size;
     char  * fileSize = calloc(32,sizeof(char)*32);
@@ -70,7 +72,7 @@ void *startFileThreaded(void * filename){
     }
 
 
-    printf("The size of the buffer i am writing to: %d \n",size);
+    if(DEBUG) printf("The size of the buffer i am writing to: %d \n",size);
 
     	int toSend =size;
     	char * filePtr = buffer;
@@ -123,7 +125,7 @@ void sendColumn(char* column){
 
     strcat(columnToSend,column);
 
-    printf("The column i am sending is: %s\n",columnToSend);
+    if(DEBUG) printf("The column i am sending is: %s\n",columnToSend);
 
     //char check[256];
 
@@ -149,9 +151,7 @@ void *startDirectory(void * path){
 	DIR *d;
 	struct dirent *dir;
 
-    printf("strt dir is starting with path: %s\n",path);
-
-
+    if(DEBUG) printf("strt dir is starting with path: %s\n",path);
 
 	d = opendir(path);
 
@@ -244,7 +244,7 @@ void sendSortRequest(){
     int size = atoi(fileSize);
     char  * finalFile = malloc(size);
 
-    printf("i am getting ready to receive a file of size %d\n",size);
+    if(DEBUG) printf("i am getting ready to receive a file of size %d\n",size);
 
     int toRead = size;
 

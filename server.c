@@ -4,8 +4,7 @@ pthread_mutex_t columnMutex;
 
 int main(int argc, char **argv)
 {
-
-	total_movies = malloc(sizeof(movie_t));
+    total_movies = malloc(sizeof(movie_t));
 
     pthread_mutex_init(&columnMutex, NULL);
 
@@ -39,19 +38,18 @@ int main(int argc, char **argv)
     
     struct sockaddr_in *result_addr = (struct sockaddr_in *) result->ai_addr;
 
-    printf("Listening on file descriptor %d, port %d\n", sock_fd, ntohs(result_addr->sin_port));
+    if(DEBUG) printf("Listening on file descriptor %d, port %d\n", sock_fd, ntohs(result_addr->sin_port));
 
-    printf("Waiting for connection...\n");
-
+    if(DEBUG) printf("Waiting for connection...\n");
 
     while(1){
 
         int client_fd = accept(sock_fd, NULL, NULL);
 
-        printf("Connection made: client_fd=%d\n", client_fd);
+        if(DEBUG) printf("Connection made: client_fd=%d\n", client_fd);
         pthread_t tid;
         pthread_create(&tid,NULL,acceptConnection, client_fd);
-        printf("num clients: %d\n",num_clients);
+        if(DEBUG) printf("num clients: %d\n",num_clients);
         pthread_join(tid,NULL);
 
     }

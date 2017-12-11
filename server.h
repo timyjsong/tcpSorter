@@ -621,7 +621,7 @@ static void *output_directory(int buffer[32], int  client_fd)
 
     fileCounter++;
 
-    printf("===\n");            
+    if(DEBUG) printf("===\n");
     free(wholeFile);
     return(NULL);
 }
@@ -630,7 +630,10 @@ static int delete_output_dir() {
     char cwd[BUFFER_SIZE];
     getcwd(cwd, sizeof(cwd));
 
-    char output_dir_name[100] = "/outputdirectory0";
+    char output_dir_name[100] = "/outputdirectory";
+    char n_c[10];
+    sprintf(n_c, "%d", num_clients);
+    strcat(output_dir_name, n_c);
     strcat(cwd, output_dir_name);
 
     DIR *d;
@@ -664,9 +667,9 @@ static void *acceptConnection(int  client_fd){
     int len = read(client_fd, buffer, sizeof(buffer));
     buffer[len] = '\0';
 
-    printf("Read %d chars\n", len);
+    if(DEBUG) printf("Read %d chars\n", len);
 
-    printf("The first thing i read on this connection is: %s\n", buffer);
+    if(DEBUG) printf("The first thing i read on this connection is: %s\n", buffer);
 
 
     //if b then create output folder, store as CSV file in output folder
@@ -682,19 +685,19 @@ static void *acceptConnection(int  client_fd){
     	}
     	buffer[i] = '\0';
         strcpy(column, buffer);
-        printf("I have received the column to sort on and it is: %s\n", column);
+        if(DEBUG) printf("I have received the column to sort on and it is: %s\n", column);
         sort_col_name[num_clients] = column;
-        printf("sortcolname: %s\n",sort_col_name[num_clients]);
-        printf("===\n");
+        if(DEBUG) printf("sortcolname: %s\n",sort_col_name[num_clients]);
+        if(DEBUG) printf("===\n");
         return(NULL);
     }
 
 
     if(buffer[0]== 'b'){
 
-        printf("The size of the incoming csv is: %s\n", buffer);
+        if(DEBUG) printf("The size of the incoming csv is: %s\n", buffer);
         memmove(buffer, buffer+1, strlen(buffer));
-        printf("New buffer size: %s\n",buffer);
+        if(DEBUG) printf("New buffer size: %s\n",buffer);
 
         output_directory(buffer, client_fd);
         
@@ -713,7 +716,7 @@ static void *acceptConnection(int  client_fd){
         //now delete the other files
         //send sorted file back to client
 
-        printf("I have received a sort request, this means all the files I need are in my directory, and I must sort and send them back\n");
+        if(DEBUG) printf("I have received a sort request, this means all the files I need are in my directory, and I must sort and send them back\n");
 
         char sizeHeader[32];
 
@@ -730,7 +733,7 @@ static void *acceptConnection(int  client_fd){
 
         int size = st.st_size;
 
-        printf("the size of the main file is: %d\n",size);
+        if(DEBUG) printf("the size of the main file is: %d\n",size);
         sprintf(sizeHeader,"%d",size);
 
         int n = write(client_fd,sizeHeader,32);
