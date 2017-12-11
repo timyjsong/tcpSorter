@@ -23,6 +23,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <ftw.h>
 
 /* defined constants */
 #define STRUCT_MEM_SIZE 1000000
@@ -81,6 +82,7 @@ int num_clients = -1;
 uses num_clients as index*/
 char *sort_col_name[1000];
 
+static int delete_output_dir();
 static void *acceptConnection(int client_fd);
 static char *split_string(char *str, char const *delimiters);
 static void check_CSV(char *fileName);
@@ -624,6 +626,38 @@ static void *output_directory(int buffer[32], int  client_fd)
     return(NULL);
 }
 
+static int delete_output_dir() {
+    char cwd[BUFFER_SIZE];
+    getcwd(cwd, sizeof(cwd));
+
+    char output_dir_name[100] = "/outputdirectory0";
+    strcat(cwd, output_dir_name);
+
+    DIR *d;
+    struct dirent *dir;
+    d = opendir(cwd);
+    if (d) {
+        while ((dir = readdir(d)) != NULL){
+            if(strcmp(dir->d_name, "..")!=0 && strcmp(dir->d_name, ".")!=0){
+                if(dir->d_type == DT_REG){
+                    char *fullpath = malloc(sizeof(char)*BUFFER_SIZE);
+                    strcpy(fullpath, cwd);
+                    strcat(fullpath, "/");
+                    strcat(fullpath, dir->d_name);
+                    remove(fullpath);
+                    free(fullpath);
+                }
+            }
+
+
+        }
+        closedir(d);
+    }
+    remove(cwd);
+
+    return 0;
+}
+
 static void *acceptConnection(int  client_fd){
 
     char buffer[32];
@@ -722,14 +756,12 @@ static void *acceptConnection(int  client_fd){
 
             filePtr+=n;
             toSend-=n;  
-        }   
+        }
 
-
-
-
-
-
-
+        // delete output directory files
+        delete_output_dir();
+        // delete the output_total.csv file
+        remove("output_total.csv");
         return(NULL);
         //exit(0);
     } 
