@@ -4,6 +4,25 @@ pthread_mutex_t columnMutex;
 
 int main(int argc, char **argv)
 {
+    // deal with input argument first
+    int c;
+    char portno[BUFFER_SIZE];
+    while ((c = getopt(argc, argv, "p:")) != -1) {
+        switch (c) {
+            case 'p':
+                strcpy(portno, optarg);
+                break;
+            case ':':
+                fprintf(stderr, "ERROR: option -%c is missing a required argument\n", optopt);
+                exit(1);
+                
+                break;
+            case '?':
+                printf("ERROR: unrecognized option\n");
+                exit(1);
+        }
+    }
+
     total_movies = malloc(sizeof(movie_t));
 
     pthread_mutex_init(&columnMutex, NULL);
@@ -16,9 +35,6 @@ int main(int argc, char **argv)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    char *portno = malloc(sizeof(char)*BUFFER_SIZE);
-    strcpy(portno, argv[2]);
-    // TODO: Implement input argument flags correctly
     s = getaddrinfo(NULL, portno, &hints, &result);
     if (s != 0) {
             fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
