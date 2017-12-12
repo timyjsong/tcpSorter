@@ -66,7 +66,7 @@ void *startFileThreaded(void * filename){
 
     write(sock_fd, firstMessage, 32);
 
-    char buffer[size];
+    char *buffer = malloc(size);
 
     if(buffer){
     	fread(buffer,1,size,file);
@@ -94,6 +94,7 @@ void *startFileThreaded(void * filename){
 
     free(fileSize);
     free(filename);
+    free(buffer);
 
 }
 
@@ -128,18 +129,7 @@ void sendColumn(char* column){
 
     if(DEBUG) printf("The column i am sending is: %s\n",columnToSend);
 
-    //char check[256];
-
-    // printf("I am now about to wait for the server to send back ready\n");
-    // while(strcmp(check, "READY")!=0){
-    // 	n = read(sock_fd,check,sizeof(check)-1);
-    // 	if(n<0){
-    // 		perror("read");
-    // 	}
-    // }
-    // printf("the server is ready i will now ssend column.\n");
-
-    //check[0] = '\0';
+  
 
     write(sock_fd, columnToSend, 32);
 
