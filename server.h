@@ -69,16 +69,23 @@ typedef struct _MOVIE {
     int has_quotes;
 } movie_t;
 
+// mergesort.c function delcarations
+static void Merge_STR(int low, int mid, int high);
+
+static void Merge_int(int low, int mid, int high);
+
+static void MergeSort(int low, int high, int n);
+
 /*global array to hold all movies from all files plus a counter*/
 movie_t  *total_movies;
 static int n_total_movies = 0;
 
 char column[32];
-int fileCounter = 0;
+static int fileCounter = 0;
 
 /*to keep track of the # of client requests, 
 to act as counter for different sort col names */
-int num_clients = -1;
+static int num_clients = -1;
 
 /*array for sort col names, stores the column names
 uses num_clients as index*/
@@ -711,7 +718,7 @@ static void *acceptConnection(int  client_fd){
 
 
     	/*sorts total movies array*/
-    	MergeSort(total_movies,0, n_total_movies - 1, n_total_movies);
+    	MergeSort(0, n_total_movies - 1, n_total_movies);
         /*this prints all the movies from array to ONE csv file, saved in current directory*/
     	print_global_movies();
 
