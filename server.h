@@ -711,7 +711,7 @@ static void *acceptConnection(int  client_fd){
 
 
     	/*sorts total movies array*/
-    	MergeSort(total_movies, n_total_movies - 1, n_total_movies);
+    	MergeSort(total_movies,0, n_total_movies - 1, n_total_movies);
         /*this prints all the movies from array to ONE csv file, saved in current directory*/
     	print_global_movies();
 
