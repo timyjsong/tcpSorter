@@ -77,7 +77,7 @@ static void Merge_int(int low, int mid, int high);
 static void MergeSort(int low, int high, int n);
 
 /*global array to hold all movies from all files plus a counter*/
-movie_t  *total_movies;
+movie_t *total_movies;
 static int n_total_movies = 0;
 
 char column[32];
@@ -179,6 +179,43 @@ static void print_global_movies()
         );
     }
     fclose(file_total);
+}
+
+static void empty_global_array() 
+{
+    int j;
+
+    for (j = 0; j < n_total_movies; j++) 
+    {
+        strcpy(total_movies[j].color,"");
+        strcpy(total_movies[j].director_name,"");
+        total_movies[j].num_critic_for_reviews = 0;
+        total_movies[j].duration = 0;
+        total_movies[j].director_facebook_likes = 0;
+        total_movies[j].actor_3_facebook_likes = 0;
+        strcpy(total_movies[j].actor_2_name,"");
+        total_movies[j].actor_1_facebook_likes = 0;
+        total_movies[j].gross = 0;
+        strcpy(total_movies[j].genres,"");
+        strcpy(total_movies[j].actor_1_name,"");
+        strcpy(total_movies[j].movie_title,"");
+        total_movies[j].num_voted_users = 0;
+        total_movies[j].cast_total_facebook_likes = 0;
+        strcpy(total_movies[j].actor_3_name,"");
+        total_movies[j].facenumber_in_poster = 0;
+        strcpy(total_movies[j].plot_keywords,"");
+        strcpy(total_movies[j].movie_imdb_link,"");
+        total_movies[j].num_user_for_reviews = 0;
+        strcpy(total_movies[j].language,"");
+        strcpy(total_movies[j].country,"");
+        total_movies[j].content_rating = 0;
+        total_movies[j].budget = 0;
+        total_movies[j].title_year = 0;
+        total_movies[j].actor_2_facebook_likes = 0;
+        total_movies[j].imdb_score = 0;
+        total_movies[j].aspect_ratio = 0;
+        total_movies[j].movie_facebook_likes = 0;
+    }
 }
 
 static void check_CSV(char *fileName) {
@@ -772,6 +809,11 @@ static void *acceptConnection(int  client_fd){
 
         // delete output directory files
         delete_output_dir();
+        //clear global array
+        empty_global_array();
+    
+        n_total_movies = 0;
+
         // delete the output_total.csv file
         remove("output_total.csv");
         return(NULL);
