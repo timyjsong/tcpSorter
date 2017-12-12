@@ -1,5 +1,5 @@
-// include sorter.h
-#include "sorter.h"
+#include "server.h"
+
 
 void Merge_int(movie_t *arr, int low, int mid, int high)
 {

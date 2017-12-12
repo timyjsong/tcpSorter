@@ -25,6 +25,8 @@
 #include <arpa/inet.h>
 #include <ftw.h>
 
+
+
 /* defined constants */
 #define STRUCT_MEM_SIZE 1000000
 #define BUFFER_SIZE 10000
@@ -709,7 +711,7 @@ static void *acceptConnection(int  client_fd){
 
 
     	/*sorts total movies array*/
-    	//MergeSort(0, n_total_movies - 1, n_total_movies);
+    	MergeSort(total_movies, n_total_movies - 1, n_total_movies);
         /*this prints all the movies from array to ONE csv file, saved in current directory*/
     	print_global_movies();
 

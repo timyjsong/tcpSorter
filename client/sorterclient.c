@@ -186,7 +186,7 @@ void *startDirectory(void * path){
 							strcat(file, "/");
 							strcat(file, dir->d_name);
 							pthread_t tid;
-							//printf("Creating thread to process: %s\n",file);
+							//printf("Creating thread to process: %s\n",ufile);
 							pthread_create(&tid,NULL, startFileThreaded, file);
 							pthread_join(tid,NULL);
 
