@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     if(DEBUG) printf("Waiting for connection...\n");
 
     while(1) {
-    	socklen_t addr_size;
+    	socklen_t addr_size = sizeof(struct sockaddr);
     	struct sockaddr_storage their_addr;
         int client_fd = accept(sock_fd, (struct sockaddr *)&their_addr, &addr_size);
 
