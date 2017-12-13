@@ -95,7 +95,7 @@ void *startFileThreaded(void * filename){
     free(fileSize);
     free(filename);
     free(buffer);
-
+    return NULL;
 }
 
 void sendColumn(char* column){
@@ -192,13 +192,12 @@ void *startDirectory(void * path){
 	}
 	
 	//free(path);
+	return NULL;
 
 }
 
-void sendSortRequest(){
-
-	
-
+void sendSortRequest(int output_dir_flag,char output_dir_name[STR_LEN])
+{
 	int s;
 	int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -255,24 +254,46 @@ void sendSortRequest(){
 
     char * filename = malloc(sizeof(char) * 1024);
 
-    strcpy(filename, "AllFiles-sorted-");
-    strcat(filename, finalColumn);
-    strcat(filename,".csv");
-
-    FILE *fp = fopen(filename, "w");
-
-    if(fp)
+    if(output_dir_flag) 
     {
-        fputs(finalFile,fp);
-    }
+    	strcpy(filename, output_dir_name);
+    	strcat(filename, "/");
+    	strcat(filename, "AllFiles-sorted-");
+    	strcat(filename, finalColumn);
+    	strcat(filename, ".csv");
+    	
+    	if(DEBUG) printf("DEBUG: output_filename: %s\n", filename);
 
-    fclose(fp);
+    	FILE *fp = fopen(filename, "w");
+
+	    if(fp)
+	    {
+	        fputs(finalFile,fp);
+	    }
+
+	    fclose(fp);
+
+    }
+    else
+    {
+    	strcpy(filename, "AllFiles-sorted-");
+	    strcat(filename, finalColumn);
+	    strcat(filename,".csv");
+
+	    FILE *fp = fopen(filename, "w");
+
+	    if(fp)
+	    {
+	        fputs(finalFile,fp);
+	    }
+
+	    fclose(fp);
+    }
 
     free(finalFile);
     free(filename);
 
     close(sock_fd);
-
 }
 
 static char *split_string(char *str, char const *delimiters) {
@@ -405,7 +426,7 @@ int main (int argc, char ** argv){
  	// }
  	startDirectory(input_dir_name);
 
-	sendSortRequest();
+	sendSortRequest(output_dir_flag, output_dir_name);
 
 	return 0;
 }
