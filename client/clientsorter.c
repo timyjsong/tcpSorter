@@ -20,11 +20,18 @@
 char port[256];
 char server[1024];
 char finalColumn[128];
+int socketCounter = 0;
+int socket_amount = 0;
 
 void *startFileThreaded(void * filename){
 
 	int s;
+	while(socket_amount != 0 && socketCounter >= socket_amount){
+		sleep(5);
+	}
+
 	int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+	socketCounter++;
 
 	struct addrinfo hints, *result;
 	memset(&hints, 0, sizeof(struct addrinfo));
@@ -91,11 +98,12 @@ void *startFileThreaded(void * filename){
     //printf("whole buffer:%s\n",buffer);
 
     close(sock_fd);
+    socketCounter--;
 
     free(fileSize);
     free(filename);
     free(buffer);
-    return NULL;
+
 }
 
 void sendColumn(char* column){
@@ -192,12 +200,13 @@ void *startDirectory(void * path){
 	}
 	
 	//free(path);
-	return NULL;
 
 }
 
-void sendSortRequest(int output_dir_flag,char output_dir_name[STR_LEN])
-{
+void sendSortRequest(){
+
+	
+
 	int s;
 	int sock_fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -254,46 +263,24 @@ void sendSortRequest(int output_dir_flag,char output_dir_name[STR_LEN])
 
     char * filename = malloc(sizeof(char) * 1024);
 
-    if(output_dir_flag) 
+    strcpy(filename, "AllFiles-sorted-");
+    strcat(filename, finalColumn);
+    strcat(filename,".csv");
+
+    FILE *fp = fopen(filename, "w");
+
+    if(fp)
     {
-    	strcpy(filename, output_dir_name);
-    	strcat(filename, "/");
-    	strcat(filename, "AllFiles-sorted-");
-    	strcat(filename, finalColumn);
-    	strcat(filename, ".csv");
-    	
-    	if(DEBUG) printf("DEBUG: output_filename: %s\n", filename);
-
-    	FILE *fp = fopen(filename, "w");
-
-	    if(fp)
-	    {
-	        fputs(finalFile,fp);
-	    }
-
-	    fclose(fp);
-
+        fputs(finalFile,fp);
     }
-    else
-    {
-    	strcpy(filename, "AllFiles-sorted-");
-	    strcat(filename, finalColumn);
-	    strcat(filename,".csv");
 
-	    FILE *fp = fopen(filename, "w");
-
-	    if(fp)
-	    {
-	        fputs(finalFile,fp);
-	    }
-
-	    fclose(fp);
-    }
+    fclose(fp);
 
     free(finalFile);
     free(filename);
 
     close(sock_fd);
+
 }
 
 static char *split_string(char *str, char const *delimiters) {
@@ -325,8 +312,8 @@ int main (int argc, char ** argv){
 
 	// read all input arguments first
 	int c, input_dir_flag = 0, output_dir_flag = 0, c_args = 0;
-	char sort_col_name[STR_LEN], input_dir_name[STR_LEN], output_dir_name[STR_LEN];
-	while ((c = getopt(argc, argv, "c:p:h:d:o:")) != -1) {
+	char sort_col_name[STR_LEN], input_dir_name[STR_LEN], output_dir_name[STR_LEN], sock_am[STR_LEN];
+	while ((c = getopt(argc, argv, "c:p:h:d:o:s:")) != -1) {
 		switch (c) {
 			case 'c':
 				c_args = 1;
@@ -391,6 +378,11 @@ int main (int argc, char ** argv){
 					exit(1);
 				}
 				break;
+			case 's':
+				strcpy(sock_am, optarg);
+				socket_amount = sock_am - '0';
+
+				break;
 			case ':':
 				switch (optopt)
 				{
@@ -426,7 +418,7 @@ int main (int argc, char ** argv){
  	// }
  	startDirectory(input_dir_name);
 
-	sendSortRequest(output_dir_flag, output_dir_name);
+	sendSortRequest();
 
 	return 0;
 }
