@@ -810,7 +810,10 @@ static void *acceptConnection(int  client_fd){
         // delete output directory files
         delete_output_dir();
         //clear global array
-        empty_global_array();
+        //empty_global_array();
+        free(total_movies);
+
+        total_movies = malloc(sizeof(movie_t));
     
         n_total_movies = 0;
 

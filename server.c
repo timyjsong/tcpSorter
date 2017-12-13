@@ -59,21 +59,28 @@ int main(int argc, char **argv)
     if(DEBUG) printf("Waiting for connection...\n");
 
     while(1) {
-
-        int client_fd = accept(sock_fd, NULL, NULL);
+    	socklen_t addr_size;
+    	struct sockaddr_storage their_addr;
+        int client_fd = accept(sock_fd, (struct sockaddr *)&their_addr, &addr_size);
 
 
         // ADDED THIS to print ip address of client
         // Doesn't print for some reason?
+        fflush(0);
         if(num_clients == -1) {
             printf("Received connections from: ");
         }
-        struct sockaddr_in ad;
-        socklen_t ad_size = sizeof(struct sockaddr_in);
-        int res = getpeername(sock_fd, (struct sockaddr *)&ad, &ad_size);
-        char clientip[20];
-        strcpy(clientip, inet_ntoa(ad.sin_addr));
-        printf("%s,", clientip);
+  
+        struct sockaddr_in* sock4addr = (struct sockaddr_in*)&their_addr;
+        struct in_addr ipAddr = sock4addr->sin_addr;
+
+        char ip[INET_ADDRSTRLEN];
+
+        inet_ntop(AF_INET,&ipAddr,ip,INET_ADDRSTRLEN);
+
+
+        fflush(0);
+        printf("%s,", ip);
 
 
 
