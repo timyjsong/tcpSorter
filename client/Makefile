@@ -1,2 +1,2 @@
 clientsorter: clientsorter.c
-	gcc clientsorter.c -o clientsorter
+	gcc -pthread -o clientsorter clientsorter.c
