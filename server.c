@@ -5,7 +5,7 @@ pthread_mutex_t columnMutex;
 
 int main(int argc, char **argv)
 {
-    // deal with input argument first
+    //  deal with input argument first
     int c;
     char portno[BUFFER_SIZE];
     while ((c = getopt(argc, argv, "p:")) != -1) {
