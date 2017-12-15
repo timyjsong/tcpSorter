@@ -423,6 +423,17 @@ int main (int argc, char ** argv){
 		}
 	}
 
+	// check arguments
+    // Always print a usage message to stderr if the program receives incorrect arguments. Failure to do so means an automatic redo.
+    // if there are no c option arguments or there are too many, then throw an error
+ 
+	if (c_args != 1) {
+    	// assume argv[0] is the program name
+    	fprintf(stderr, "ERROR: Usage: ./sorter -c  columnName -h hostname -p portnum -d thisdir -o thatdir");
+    	// throw an exit failure message
+    	exit(1);
+    }
+
 	if (!input_dir_flag) {
  		getcwd(input_dir_name, sizeof(char)*STR_LEN);
 	}
